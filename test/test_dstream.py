@@ -9,6 +9,44 @@ def test_toList():
     assert r == [1, 2, 3, 4]
 
 
+def test___iter__():
+    stream = Stream([1, 2, 3, 4])
+    assert hasattr(stream, '__iter__')
+    assert [1, 2, 3, 4] == [data for data in stream]
+
+
+def test_empty():
+    r = Stream.empty().toList()
+    assert r == []
+
+
+def test_of_1():
+    r = Stream.of().toList()
+    assert r == []
+
+
+def test_of_2():
+    r = Stream.of(1, 2, 3).toList()
+    assert r == [1, 2, 3]
+
+
+def test_iterate():
+    r = Stream.iterate(0, lambda x: x + 1).limit(3).toList()
+    assert r == [0, 1, 2]
+
+
+def test_generate():
+    r = Stream.generate(lambda: 10).limit(3).toList()
+    assert r == [10, 10, 10]
+
+
+def test_concat():
+    s1 = Stream([1, 2])
+    s2 = Stream([3, 4])
+    r = Stream.concat(s1, s2).toList()
+    assert r == [1, 2, 3, 4]
+
+
 def test_filter():
     stream = Stream([1, 2, 3, 4])
     r = stream.filter(lambda x: x % 2 == 0).toList()

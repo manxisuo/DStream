@@ -3,14 +3,55 @@ from __future__ import print_function
 from functools import reduce
 
 
+def _infinity():
+    while True:
+        yield None
+
+
+_INF = _infinity()
+
+
 class Stream:
     def __init__(self, iterable):
+        if not hasattr(iterable, '__iter__'):
+            raise TypeError('The argument must be iterable.')
         self.stream = iterable
 
-    # TODO
-    @staticmethod
-    def fromFile(self, filename):
-        pass
+    def __iter__(self):
+        return self.stream.__iter__()
+
+    @classmethod
+    def empty(cls):
+        return cls([])
+
+    @classmethod
+    def of(cls, *elements):
+        return cls(elements)
+
+    # 迭代
+    @classmethod
+    def iterate(cls, initial, func):
+        def g():
+            val = initial
+            while True:
+                yield val
+                val = func(val)
+        return cls(g())
+
+    # 生成
+    @classmethod
+    def generate(cls, func):
+        return cls(func() for _ in _INF)
+
+    # 连接
+    @classmethod
+    def concat(cls, stream1, stream2):
+        def g():
+            for data in stream1:
+                yield data
+            for data in stream2:
+                yield data
+        return cls(g())
 
     # 过滤
     def filter(self, func):
@@ -77,13 +118,13 @@ class Stream:
     def toList(self):
         return [data for data in self.stream]
 
-    # 约减
+    # 规约
     def reduce(self, func, initial=None):
         return reduce(func, self.stream) if initial is None else reduce(func, self.stream, initial)
 
     # TODO
     def collect(self):
-        pass
+        raise NotImplementedError
 
     # 最小值
     def min(self):
